@@ -8,7 +8,6 @@ class BWT:
         self.firstColumn = sorted(self.lastColumn)  
         self.firstOccurence = self.FirstOccurence()
         self.count = self.Count()
-        self.suffix_array = self.suffix_array(self.bwt)
     def FirstOccurence(self):
         return {char: self.firstColumn.index(char) for char in self.alphabet}
 
@@ -37,27 +36,6 @@ class BWT:
                 return bottom - top + 1
         return 0
         
-    def suffix_array(sequence):
-        return sorted(range(len(sequence)), key=lambda i: sequence[i:])
-    
-    def find_seeds(bwt, sa, read, k):
-        seeds = []
-        for i in range(len(read) - k + 1):
-            kmer = read[i:i+k]
-            l, r = 0, len(bwt)
-            for char in reversed(kmer):
-                l = bwt.find(char, l, r)
-                r = bwt.find(char, l, r) + bwt.count(char, l, r)
-                if l == r:
-                    break
-            if l < r:
-                seeds.append((kmer, sa[l:r]))
-        return seeds
-    def fm_index(sequence):
-        bwt = bwt.bwt 
-        sa = bwt.suffix_array()
-        return bwt, sa
-
 def better_bw_matching(bwt: str, patterns: List[str]) -> List[int]:
     bwMatching = []
     bw = BWT(bwt)
