@@ -20,3 +20,21 @@ def parse_fastq(fastq: Iterable[str]) -> List[Tuple[str, str]]:
         quality_scores = fastq[i+3].strip()
         fastq_list.append((sequence_id, sequence, quality_scores))
     return fastq_list
+
+
+def parse_reference_genome(fasta: Iterable[str]) -> Tuple[str, str]:
+    """
+    Parse a FASTA file containing a reference genome and return a tuple containing
+    the sequence ID and the sequence itself.
+
+    :param fasta: An iterable containing the lines of a FASTA file
+    :return: A tuple containing the sequence ID and the sequence itself
+
+    Example:
+    >>> fasta = ['>ref_genome', 'ATCG'] # ref_genome and ATCG are the sequence ID and sequence respectively in this example
+    >>> parse_reference_genome(fasta)
+    ('ref_genome', 'ATCG')
+    """
+    sequence_id = fasta[0][1:].strip()
+    sequence = fasta[1].strip()
+    return sequence_id, sequence
