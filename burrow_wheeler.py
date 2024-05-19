@@ -53,6 +53,7 @@ class BWT:
             if l < r:
                 seeds.append((kmer, sa[l:r]))
         return seeds
+    
     def fm_index(sequence):
         bwt = bwt.bwt 
         sa = bwt.suffix_array()
