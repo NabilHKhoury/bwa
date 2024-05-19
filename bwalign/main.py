@@ -1,8 +1,10 @@
 # This file is the main file for the project. It will be used to run the project and test the different algorithms.
 import utils
-def main():
-    # Read the input file
-    with open(r"C:\Users\Nabil\Desktop\School\Spring2024\CSE185 - Bioinfo Lab\project\bwalign\data\test.fastq") as f:
+import argparse
+
+def main(reference_genome_path, fastq_file_path):
+    # Read the input FASTQ file
+    with open(fastq_file_path) as f:
         fastq = f.readlines()
 
     # Parse the FASTQ file
@@ -11,9 +13,8 @@ def main():
     # Print the first sequence
     print(sequences[0])
 
-
     # Read the reference genome file
-    with open(r"C:\Users\Nabil\Desktop\School\Spring2024\CSE185 - Bioinfo Lab\project\bwalign\data\test_reference.fa") as f:
+    with open(reference_genome_path) as f:
         reference_genome = f.readlines()
 
     # Parse the reference genome
@@ -23,4 +24,9 @@ def main():
     print(reference_sequence)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Run BWA alignment with specified reference genome and FASTQ file.")
+    parser.add_argument("reference_genome", type=str, help="Path to the reference genome file")
+    parser.add_argument("fastq_file", type=str, help="Path to the FASTQ file")
+
+    args = parser.parse_args()
+    main(args.reference_genome, args.fastq_file)
