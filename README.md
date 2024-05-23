@@ -34,4 +34,4 @@ The output file will be a SAM file.
 
 ## Contributors
 
-This repository was made in collaboration by Nabil Khoury, Yasmin Jaber, and Adrian Layer. Inspiration from [BWA-MEM](https://bio-bwa.sourceforge.net/bwa.shtml).
+This repository was made in collaboration by Nabil Khoury, Yasmin A. Jaber, and Adrian Layer. Inspiration from [BWA-MEM](https://bio-bwa.sourceforge.net/bwa.shtml).
