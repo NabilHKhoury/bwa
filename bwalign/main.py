@@ -1,26 +1,19 @@
-# This file is the main file for the project. It will be used to run the project and test the different algorithms.
 import utils
 import argparse
 
 def main(reference_genome_path, fastq_file_path):
-    # Read the input FASTQ file
-    with open(fastq_file_path) as f:
-        fastq = f.readlines()
-
     # Parse the FASTQ file
-    sequences = utils.parse_fastq(fastq)
+    sequences = utils.parse_fastq(fastq_file_path)
     
     # Print the first sequence
-    print(sequences[0])
-
-    # Read the reference genome file
-    with open(reference_genome_path) as f:
-        reference_genome = f.readlines()
-
+    print("Sequences from FASTQ:")
+    for seq in sequences:
+        print(seq)
     # Parse the reference genome
-    reference_sequence = utils.parse_reference_genome(reference_genome)
+    reference_sequence = utils.parse_reference_genome(reference_genome_path)
 
     # Print the reference sequence ID and sequence
+    print("Reference genome sequence:")
     print(reference_sequence)
 
 if __name__ == "__main__":
