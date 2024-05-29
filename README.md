@@ -12,6 +12,10 @@ If you do not have root access, you can include the user flag like so:
 
 `pip install bwalign --user`
 
+If on Linux/Unix, or any OS where bin is not on the PATH, you may need to add it manually. For `datahub.ucsd.edu` users, the command will be:
+
+`export PATH=$PATH:/home/$USER/.local/bin` after running the above pip. Every time you close the terminal, you will need to rerun this.
+
 ## Usage
 
 Usage is as follows:
