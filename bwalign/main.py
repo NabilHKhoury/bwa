@@ -1,4 +1,5 @@
 import utils
+import pysam
 import argparse
 
 def main(reference_genome_path, fastq_file_path):
@@ -26,14 +27,14 @@ def main(reference_genome_path, fastq_file_path):
     }
     
     #write to sam FILE
-    with utils.AlignmentFile("output.sam", "w", header=header) as samfile:
+    with pysam.AlignmentFile("output.sam", "w", header=header) as samfile:
         for read_id, read_seq, qual_scores in reads:
             
             seed_idxes = utils.generate_seeds(str(read_seq), bwt, 8, psa, first_occurrences, checkpoint_arrs, ranks)
             best_idx, score, alignment_s, alignment_t = utils.compute_max_seed(str(reference), str(read_seq), seed_idxes, 2, 1, 2, 1, read_length)
 
             #create a SAM entry for the aligned read
-            a = utils.AlignedSegment()
+            a = pysam.AlignedSegment()
             a.query_name = read_id
             a.query_sequence = read_seq
             a.flag = 0
@@ -52,3 +53,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main(args.reference_genome, args.fastq_file)
+
+# test 2 started at 8:32 PM, finished 8:38 PM
