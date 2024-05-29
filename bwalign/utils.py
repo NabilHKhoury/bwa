@@ -355,8 +355,6 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
     with open(fasta_path, "r") as handle:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
-        
-
 
 def random_sequence(length: int) -> str:
     """
@@ -375,7 +373,6 @@ def random_quality_scores(length: int) -> List[int]:
     :return: A list of random quality scores
     """
     return ''.join(random.choices('!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHI', k=length))
-
 
 def random_id(length: int) -> str:
     """

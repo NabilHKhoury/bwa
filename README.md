@@ -4,33 +4,37 @@ This is a python tool designed for read alignment to a reference genome. It util
 
 ## Installation Instructions
 
-**TBC**
+Do:
 
-## Basic Usage
+`pip install bwalign`
 
-Basic usage is:
+If you do not have root access, you can include the user flag like so:
+
+`pip install bwalign --user`
+
+## Usage
+
+Usage is as follows:
 
 `bwalign <reference genome path> <fastq file>`
 
-This will align reads to your reference genome using the default scoring parameters for affine alignment, which are: **TBD**
+Both the reference genome and single fastq file are required parameters.
 
-To run on an example dataset in this repo, do:
+This will align reads to your reference genome using the default scoring parameters for affine alignment, which are: match reward (2), mismatch penalty (-1), gap opening penalty (-2), gap extension penalty (-1).
 
-`bwalign foo.gz bar.fq`
+If you wish to run 
 
-## Complete Usage
+On a test dataset from this project, do:
 
-Only the reference genome and single fastq file are required parameters. Otherwise, users can input the scoring parameters for the affine alignment portion of the tool.
+`git clone git@github.com:NabilHKhoury/bwalign.git`
 
-* `-m MATCHREWARD`, `--match MATCHREWARD`: this defines the addition to total score upon finding a match in the alignment.
-* `-i OPENPEN`, `--open OPENPEN`: defines the penalty to total score upon opening a gap in the alignment.
-* `-e EXTPEN`, `--extension EXTPEN`: defines penalty to total score for extending a gap in the alignment.
-* `-x MMPEN`, `--mismatch MMPEN`: defines penalty to total score for a mismatch in the alignment.
-* `-o FILE`, `--output FILE`: writes the output to a file. By default, output writes to stdout.
+into your desired directory of choice, then `cd bwalign/data`
 
-## File Format
+And run `bwalign` on the reference genome `random_reference.fasta` and `random_reads.fastq`.
 
-The output file will be a SAM file.
+## Output/File Format
+
+The output file will be a SAM file with the name `output.sam` (will be changed in future releases). It will be outputted in the directory you ran `bwalign` from.
 
 ## Contributors
 
