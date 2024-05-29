@@ -41,7 +41,7 @@ def main(reference_genome_path, fastq_file_path):
             a.reference_id = 0
             a.reference_start = best_idx
             a.mapping_quality = 60
-            a.cigarstring = f"{len(alignment_s.replace('-', ''))}M"
+            a.cigarstring = calculate_cigar(alignment_s, alignment_t)
             a.query_qualities = qual_scores
             
             samfile.write(a)
