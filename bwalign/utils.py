@@ -1,6 +1,5 @@
 from Bio import SeqIO
 from typing import List, Tuple
-<<<<<<< HEAD
 import sys
 import random
 
@@ -330,9 +329,6 @@ def generate_seeds(read: str, bwt: str, k: int, psa: dict[int, int],
     return seed_idxes
 
 ### FASTQ PARSING
-=======
-import random
->>>>>>> 5eb53e9 (updatefastq in one file)
 
 def parse_fastq(fastq_path: str) -> List[Tuple[str, str, List[int]]]:
     """
@@ -360,14 +356,7 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
         
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-import random
->>>>>>> ed60880 (updates test data)
-=======
->>>>>>> 5eb53e9 (updatefastq in one file)
 
 def random_sequence(length: int) -> str:
     """
