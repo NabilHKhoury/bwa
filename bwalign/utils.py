@@ -373,6 +373,7 @@ def generate_fastq_file(file, read_id, sequence, quality):
     file.write(quality + "\n")
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     :param fastq_path: Path to the FASTQ file to be generated
     :param sequence_id: The sequence ID
@@ -386,6 +387,8 @@ def generate_fastq_file(file, read_id, sequence, quality):
         handle.write("".join(chr(score + 33) for score in quality_scores))
         
 >>>>>>> 39739db (Moved relevant functions to utils.py)
+=======
+>>>>>>> 6076c3f (updates test data)
 def main():
     # Define parameters for random sequence and quality scores
     sequence_length = 100000
