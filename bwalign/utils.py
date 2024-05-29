@@ -1,6 +1,7 @@
 from Bio import SeqIO
 from typing import List, Tuple
 import sys
+import random
 
 ### CIGAR STRING CREATOR
 
@@ -318,9 +319,7 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
         
-import random
 
-### RANDOM SEQUENCE DATASET GENERATION
 
 def random_sequence(length: int) -> str:
     """
