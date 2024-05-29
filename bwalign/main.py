@@ -46,7 +46,7 @@ def main():
             a.reference_id = 0
             a.reference_start = best_idx
             a.mapping_quality = 60
-            a.cigarstring = calculate_cigar(alignment_s, alignment_t)
+            a.cigarstring = utils.calculate_cigar(alignment_s, alignment_t)
             a.query_qualities = qual_scores
             
             samfile.write(a)
