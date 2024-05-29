@@ -26,6 +26,8 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
     with open(fasta_path, "r") as handle:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
+        
+import random
 
 def random_sequence(length: int) -> str:
     """
@@ -34,7 +36,6 @@ def random_sequence(length: int) -> str:
     :param length: The length of the sequence
     :return: A random DNA sequence
     """
-    import random
     return ''.join(random.choices('ACGT', k=length))
 
 def random_quality_scores(length: int) -> List[int]:
@@ -44,8 +45,8 @@ def random_quality_scores(length: int) -> List[int]:
     :param length: The length of the sequence
     :return: A list of random quality scores
     """
-    import random
-    return [random.randint(0, 40) for _ in range(length)]
+    return ''.join(random.choices('!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHI', k=length))
+
 
 def random_id(length: int) -> str:
     """
@@ -54,8 +55,7 @@ def random_id(length: int) -> str:
     :param length: The length of the sequence ID
     :return: A random sequence ID
     """
-    import random
-    return ''.join(random.choices('ACGT', k=length))
+    return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=length))
 
 def generate_fasta_file(fasta_path: str, sequence_id: str, sequence: str):
     """
@@ -69,23 +69,16 @@ def generate_fasta_file(fasta_path: str, sequence_id: str, sequence: str):
         handle.write(f">{sequence_id}\n")
         handle.write(sequence)
 
-def generate_fastq_file(fastq_path: str, sequence_id: str, sequence: str, quality_scores: List[int]):
-    """
-    Generate a FASTQ file with the specified sequence ID, sequence, and quality scores.
+def generate_fastq_file(file, read_id, sequence, quality):
+    """Append a read to the FASTQ file."""
+    file.write(f"@{read_id}\n")
+    file.write(sequence + "\n")
+    file.write("+\n")
+    file.write(quality + "\n")
 
-    :param fastq_path: Path to the FASTQ file to be generated
-    :param sequence_id: The sequence ID
-    :param sequence: The sequence
-    :param quality_scores: The quality scores
-    """
-    with open(fastq_path, "w") as handle:
-        handle.write(f"@{sequence_id}\n")
-        handle.write(f"{sequence}\n")
-        handle.write("+\n")
-        handle.write("".join(chr(score + 33) for score in quality_scores))
 def main():
     # Define parameters for random sequence and quality scores
-    sequence_length = 100
+    sequence_length = 100000
     sequence_id_length = 10
 
     # Generate random reference genome
@@ -93,13 +86,18 @@ def main():
     ref_sequence = random_sequence(sequence_length)
     generate_fasta_file(r"C:\Users\Nabil\Desktop\School\Spring2024\CSE185 - Bioinfo Lab\project\bwalign\data\random_reference.fasta", ref_sequence_id, ref_sequence)
 
-    # Generate random FASTQ reads
+    # Parameters for FASTQ reads
+    sequence_length = 50
     num_reads = 10
-    for i in range(num_reads):
-        read_id = random_id(sequence_id_length)
-        read_sequence = random_sequence(sequence_length)
-        read_quality = random_quality_scores(sequence_length)
-        generate_fastq_file(f"random_read_{i+1}.fastq", read_id, read_sequence, read_quality)
+    fastq_filename = r"C:\Users\Nabil\Desktop\School\Spring2024\CSE185 - Bioinfo Lab\project\bwalign\data\random_reads.fastq"
+
+    # Generate random FASTQ reads and write to a single file
+    with open(fastq_filename, 'w') as file:
+        for i in range(num_reads):
+            read_id = random_id(sequence_id_length)
+            read_sequence = random_sequence(sequence_length)
+            read_quality = random_quality_scores(sequence_length)
+            generate_fastq_file(file, read_id, read_sequence, read_quality)
 
 if  __name__ == '__main__':
     main()

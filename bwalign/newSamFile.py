@@ -14,7 +14,7 @@ def main():
     first_occurrences = compute_first_occurrences(bwt)
     checkpoint_arrs = compute_checkpoint_arrs(bwt)
     ranks = compute_rank_arr(bwt)
-
+    
     #header for the SAM file (based on ref)
     header = {
         'HD': {'VN': '1.0', 'SO': 'unsorted'},
