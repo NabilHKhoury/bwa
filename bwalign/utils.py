@@ -1,5 +1,6 @@
 from Bio import SeqIO
 from typing import List, Tuple
+import random
 
 def parse_fastq(fastq_path: str) -> List[Tuple[str, str, List[int]]]:
     """
@@ -27,7 +28,6 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
         
-import random
 
 def random_sequence(length: int) -> str:
     """
