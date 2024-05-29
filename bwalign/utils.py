@@ -356,7 +356,11 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
         
+<<<<<<< HEAD
 
+=======
+import random
+>>>>>>> ed60880 (updates test data)
 
 def random_sequence(length: int) -> str:
     """
