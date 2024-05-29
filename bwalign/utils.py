@@ -1,9 +1,44 @@
 from Bio import SeqIO
 from typing import List, Tuple
-<<<<<<< HEAD
-import random
-=======
 import sys
+import random
+
+### CIGAR STRING CREATOR
+
+def calculate_cigar(alignment_s, alignment_t):
+    cigar = []
+    match = 0
+    ins = 0
+    del_ = 0
+
+    for s, t in zip(alignment_s, alignment_t):
+        if s == '-' and t != '-':  #del in quer
+            if match > 0:
+                cigar.append(f"{match}M") 
+                match = 0
+            del_ += 1
+        elif s != '-' and t == '-':  #insertion
+            if match > 0:
+                cigar.append(f"{match}M")
+                match = 0
+            ins += 1
+        else:  # Match or mismatch
+            if ins > 0:
+                cigar.append(f"{ins}I")  
+                ins = 0
+            if del_ > 0:
+                cigar.append(f"{del_}D")
+                del_ = 0
+            match += 1
+
+    if match > 0:
+        cigar.append(f"{match}M")
+    if ins > 0:
+        cigar.append(f"{ins}I")
+    if del_ > 0:
+        cigar.append(f"{del_}D")
+
+    return ''.join(cigar)
 
 ### CIGAR STRING CREATOR
 
@@ -294,7 +329,6 @@ def generate_seeds(read: str, bwt: str, k: int, psa: dict[int, int],
     return seed_idxes
 
 ### FASTQ PARSING
->>>>>>> 39739db (Moved relevant functions to utils.py)
 
 def parse_fastq(fastq_path: str) -> List[Tuple[str, str, List[int]]]:
     """
@@ -322,12 +356,7 @@ def parse_reference_genome(fasta_path: str) -> Tuple[str, str]:
         for record in SeqIO.parse(handle, "fasta"):
             return record.id, str(record.seq)
         
-<<<<<<< HEAD
-=======
-import random
->>>>>>> fac787b (updates test data)
 
-### RANDOM SEQUENCE DATASET GENERATION
 
 def random_sequence(length: int) -> str:
     """
@@ -376,23 +405,6 @@ def generate_fastq_file(file, read_id, sequence, quality):
     file.write("+\n")
     file.write(quality + "\n")
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    :param fastq_path: Path to the FASTQ file to be generated
-    :param sequence_id: The sequence ID
-    :param sequence: The sequence
-    :param quality_scores: The quality scores
-    """
-    with open(fastq_path, "w") as handle:
-        handle.write(f"@{sequence_id}\n")
-        handle.write(f"{sequence}\n")
-        handle.write("+\n")
-        handle.write("".join(chr(score + 33) for score in quality_scores))
-        
->>>>>>> 39739db (Moved relevant functions to utils.py)
-=======
->>>>>>> 6076c3f (updates test data)
 def main():
     # Define parameters for random sequence and quality scores
     sequence_length = 100000
