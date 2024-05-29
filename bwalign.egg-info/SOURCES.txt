@@ -1,0 +1,11 @@
+README.md
+setup.py
+bwalign/__init__.py
+bwalign/main.py
+bwalign/utils.py
+bwalign.egg-info/PKG-INFO
+bwalign.egg-info/SOURCES.txt
+bwalign.egg-info/dependency_links.txt
+bwalign.egg-info/entry_points.txt
+bwalign.egg-info/requires.txt
+bwalign.egg-info/top_level.txt
