@@ -1,4 +1,4 @@
-from bwalign import utils
+import utils
 import pysam
 import argparse
 
@@ -19,8 +19,9 @@ def main():
     #BWT and SA
     K = 5
     ref_text = str(reference) + '$'
-    bwt = utils.burrows_wheeler_transform(ref_text)
-    psa = utils.partial_suffix_array(ref_text, K)
+    sa = utils.suffix_array(ref_text)
+    psa = utils.partial_suffix_array(sa, K)
+    bwt = utils.bwt_from_suffixarray(ref_text, sa)
     first_occurrences = utils.compute_first_occurrences(bwt)
     checkpoint_arrs = utils.compute_checkpoint_arrs(bwt)
     ranks = utils.compute_rank_arr(bwt)
@@ -45,7 +46,7 @@ def main():
             a.flag = 0
             a.reference_id = 0
             a.reference_start = best_idx
-            a.mapping_quality = calculate_mapping_quality(score, read_length)
+            a.mapping_quality = utils.calculate_mapping_quality(score, read_length)
             a.cigarstring = utils.calculate_cigar(alignment_s, alignment_t)
             a.query_qualities = qual_scores
             

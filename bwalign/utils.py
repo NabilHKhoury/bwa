@@ -4,7 +4,6 @@ import sys
 import random
 import math
 
-
 def calculate_mapping_quality(score, read_length):  
     max_possible_score = 2 * read_length
     
@@ -213,28 +212,110 @@ def compute_max_seed(ref: str, read: str, seed_idxes: list[list[int]],
 
 ### SEED GENERATION
 
-def burrows_wheeler_transform(text: str) -> str:
-    """
-    Generate the Burrows-Wheeler Transform of the given text.
-    """
-    cyclic_rotations = []
-    for i in range(0,len(text)):
-        cyclic_rotations.append(text[i:] + text[:i])
-    M = sorted(cyclic_rotations)
-    bwt = ''
-    for rotation in M:
-        bwt = bwt + rotation[len(rotation)-1]
-    return bwt
+## BWT creation
+def bwt_from_suffixarray(text: str, suffix_array: List[int]) -> str:
+    bwt = []
+    for idx in suffix_array:
+        bwt.append(text[idx-1])
+    return ''.join(bwt)
 
-def partial_suffix_array(text: str, k: int) -> dict[int, int]:
+# SUFFIX ARRAY CONSTRUCTION
+class suffix:
+    """
+    Class built to store suffix array indices, conserving memory.
+    """
+    def __init__(self):
+        self.index = 0
+        self.rank = [0,0]
+
+def get_rank(char: str) -> int:
+    """
+    Converts the given char to its ascii value, then subtracts 'a' from it to get a
+    clean rank value.
+    """
+    return ord(char) - ord('a')
+
+def suffix_array(text: str) -> list[int]:
+    """
+    Generates the suffix array of a given database string text using O(n(logn)^2)
+    time complexity and O(n) space. To improve to O(nlogn), can use radix sort to
+    sort the suffix lists.
+    
+    Algorithm ripped from:
+    https://www.geeksforgeeks.org/suffix-array-set-2-a-nlognlogn-algorithm/
+    """
+    
+    # get the intial array of suffixes before starting to loop through and rank them.
+    suffixes = [suffix() for _ in range(len(text))]
+    
+    # initial (k=2) ranking of suffixes
+    for i in range(0, len(text)):
+        suffixes[i].index = i
+        suffixes[i].rank[0] = get_rank(text[i])
+        if (i + 1) < len(text):
+            suffixes[i].rank[1] = get_rank(text[i+1])
+        else:
+            suffixes[i].rank[1] = -1
+    
+    # https://stackoverflow.com/questions/9376384/sort-a-list-of-tuples-depending-on-two-elements
+    suffixes = sorted(suffixes, key=lambda element: (element.rank[0], element.rank[1]))
+    
+    ind = [0] * len(text) # array to keep track of indices while computing ranks
+    
+    k = 4
+    while (k < 2 * len(text)):
+         
+        # Assigning rank and index 
+        # values to first suffix
+        rank = 0
+        prev_rank = suffixes[0].rank[0]
+        suffixes[0].rank[0] = rank
+        ind[suffixes[0].index] = 0
+ 
+        # Assigning rank to suffixes
+        for i in range(1, len(text)):
+             
+            # If first rank and next ranks are 
+            # same as that of previous suffix in
+            # array, assign the same new rank to 
+            # this suffix
+            if (suffixes[i].rank[0] == prev_rank and
+                suffixes[i].rank[1] == suffixes[i - 1].rank[1]):
+                prev_rank = suffixes[i].rank[0]
+                suffixes[i].rank[0] = rank
+                 
+            # Otherwise increment rank and assign    
+            else:  
+                prev_rank = suffixes[i].rank[0]
+                rank += 1
+                suffixes[i].rank[0] = rank
+            ind[suffixes[i].index] = i
+ 
+        # Assign next rank to every suffix
+        for i in range(len(text)):
+            nextindex = suffixes[i].index + k // 2
+            suffixes[i].rank[1] = suffixes[ind[nextindex]].rank[0] if (nextindex < len(text)) else -1
+ 
+        # Sort the suffixes according to
+        # first k characters
+        suffixes = sorted(suffixes, key = lambda element: (element.rank[0], element.rank[1]))
+ 
+        k *= 2
+        
+    to_return = []
+    for i in range(0, len(text)):
+        to_return.append(suffixes[i].index)
+        
+    return to_return
+
+def partial_suffix_array(sa: list[int], k: int) -> dict[int, int]:
     """
     Generate a partial suffix array for the given text and interval K.
     """
-    full_suffix_array = sorted(range(len(text)), key=lambda i: text[i:]) # taken from Nabil's bw code
     partial = dict()
-    for idx in full_suffix_array:
-        if full_suffix_array[idx] % k == 0:
-            partial[idx] = full_suffix_array[idx]
+    for idx in sa:
+        if sa[idx] % k == 0:
+            partial[idx] = sa[idx]
     return partial
 
 def compute_rank_arr(bwt: str) -> list[int]:
