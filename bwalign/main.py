@@ -45,7 +45,7 @@ def main():
             a.flag = 0
             a.reference_id = 0
             a.reference_start = best_idx
-            a.mapping_quality = 60
+            a.mapping_quality = calculate_mapping_quality(score, read_length)
             a.cigarstring = utils.calculate_cigar(alignment_s, alignment_t)
             a.query_qualities = qual_scores
             
