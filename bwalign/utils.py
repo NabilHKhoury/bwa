@@ -2,6 +2,26 @@ from Bio import SeqIO
 from typing import List, Tuple
 import sys
 import random
+import math
+
+
+def calculate_mapping_quality(score, read_length):  
+    max_possible_score = 2 * read_length
+    
+    if score < 0:
+        return 0 
+
+    if max_possible_score > 0:
+        probability = score / max_possible_score
+    else:
+        probability = 0
+
+    if probability > 0:
+        mapping_quality = -10 * math.log10(1 - probability)
+    else:
+        mapping_quality = 0
+
+    return min(int(mapping_quality), 60)
 
 ### CIGAR STRING CREATOR
 
