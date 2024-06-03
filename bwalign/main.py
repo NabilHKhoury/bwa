@@ -34,7 +34,7 @@ def main():
     with pysam.AlignmentFile("output.sam", "w", header=header) as samfile:
         for read_id, read_seq, qual_scores in reads:
             
-            seed_idxes = generate_seeds(str(read_seq), bwt, 8, psa, first_occurrences, checkpoint_arrs, ranks)
+            seed_idxes = generate_seeds(str(read_seq), bwt, 19, psa, first_occurrences, checkpoint_arrs, ranks)
             best_idx, score, alignment_s, alignment_t = compute_max_seed(str(reference), str(read_seq), seed_idxes, 2, 1, 2, 1, read_length)
 
             #create a SAM entry for the aligned read
