@@ -1,4 +1,4 @@
-import utils
+import utils as utils
 import pysam
 import argparse
 
@@ -21,7 +21,7 @@ def main():
     ref_text = str(reference) + '$'
     sa = utils.suffix_array(ref_text)
     psa = utils.partial_suffix_array(sa, K)
-    bwt = utils.bwt_from_suffixarray(ref_text, sa)
+    bwt = utils.bwt_from_suffix_array(ref_text, sa)
     first_occurrences = utils.compute_first_occurrences(bwt)
     checkpoint_arrs = utils.compute_checkpoint_arrs(bwt)
     ranks = utils.compute_rank_arr(bwt)

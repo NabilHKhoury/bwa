@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='bwalign',
-    version='1.0.0',    
+    version='1.0.1',    
     description='A burrows-wheeler seed and extend aligner',
     url='https://github.com/NabilHKhoury/bwalign',
     author=['Adrian Layer, Nabil Khoury, Yasmin Jabir'],

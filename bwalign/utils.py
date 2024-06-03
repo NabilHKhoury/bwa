@@ -212,14 +212,8 @@ def compute_max_seed(ref: str, read: str, seed_idxes: list[list[int]],
 
 ### SEED GENERATION
 
-## BWT creation
-def bwt_from_suffixarray(text: str, suffix_array: List[int]) -> str:
-    bwt = []
-    for idx in suffix_array:
-        bwt.append(text[idx-1])
-    return ''.join(bwt)
-
 # SUFFIX ARRAY CONSTRUCTION
+
 class suffix:
     """
     Class built to store suffix array indices, conserving memory.
@@ -317,6 +311,13 @@ def partial_suffix_array(sa: list[int], k: int) -> dict[int, int]:
         if sa[idx] % k == 0:
             partial[idx] = sa[idx]
     return partial
+
+## BWT creation
+def bwt_from_suffix_array(text: str, suffix_array: List[int]) -> str:
+    bwt = []
+    for idx in suffix_array:
+        bwt.append(text[idx-1])
+    return ''.join(bwt)
 
 def compute_rank_arr(bwt: str) -> list[int]:
     """
