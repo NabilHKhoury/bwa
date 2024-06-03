@@ -37,16 +37,22 @@ def main():
             
             seed_idxes = generate_seeds(str(read_seq), bwt, 19, psa, first_occurrences, checkpoint_arrs, ranks)
             best_idx, score, alignment_s, alignment_t = compute_max_seed(str(reference), str(read_seq), seed_idxes, 2, 2, 2, 10, read_length)
-
+            
             #create a SAM entry for the aligned read
             a = pysam.AlignedSegment()
             a.query_name = read_id
             a.query_sequence = read_seq
             a.flag = 0
             a.reference_id = 0
-            a.reference_start = best_idx
-            a.mapping_quality = calculate_mapping_quality(score, read_length)
-            a.cigarstring = calculate_cigar(alignment_s, alignment_t)
+            if score != float('-inf'):
+                a.reference_start = best_idx
+                a.mapping_quality = 60
+                # a.mapping_quality = calculate_mapping_quality(score, read_length)
+                a.cigarstring = calculate_cigar(alignment_s, alignment_t)
+            else:
+                a.reference_start = 0
+                a.mapping_quality = 0
+                a.cigarstring = '0M'
             a.query_qualities = qual_scores
             
             samfile.write(a)

@@ -16,8 +16,10 @@ def calculate_mapping_quality(score, read_length):
     else:
         probability = 0
 
-    if probability > 0:
-        mapping_quality = -10 * np.log10(1 - probability)
+    if probability == 1:
+        return max_possible_score
+    elif probability > 0:
+        mapping_quality = -10 * np.log10(1.0 - probability)
     else:
         mapping_quality = 0
 
@@ -60,9 +62,35 @@ def calculate_cigar(alignment_s, alignment_t):
 
     return ''.join(cigar)
 
-### AFFINE ALIGNMENT
+### BANDED ALIGNMENT
 
-def BandedAlignment(match_reward: int, mismatch_penalty: int, indel_penalty: int,
+def banded_alignment(mr: int, mmp: int, indp: int, bp: int, s: str, t: str) -> int:
+    l = np.full((len(s)+1,len(t)+1), -np.inf)
+    for i in range(0, len(s) + 1):
+        for j in range(0, len(t) + 1):
+            if i == 0 and j == 0:
+                l[i,j] = 0
+                continue
+            if abs(j-i) < bp:
+                if i == 0:
+                    l[i,j] = j * (-indp)
+                    continue
+                if j == 0:
+                    l[i,j] = i * (-indp)
+                    continue
+                match = -mmp
+                if s[i-1] == t[j-1]:
+                    match = mr
+                l[i,j] = max(l[i-1][j] - indp, l[i][j-1] - indp, l[i-1][j-1] + match)
+            else:
+                continue
+    score = l[len(s),len(t)]
+    if score > float('-inf'):
+        return int(l[len(s),len(t)])
+    else:
+        return float('-inf')
+
+def BandedAlignmentWithBackTrack(match_reward: int, mismatch_penalty: int, indel_penalty: int,
                     band_parameter: int, s: str, t: str) -> tuple[int, str, str]:
     sys.setrecursionlimit(1500)
     l = [[float('-inf')] * (len(t) + 1) for _ in range(len(s) + 1)] # score matrix
@@ -124,21 +152,24 @@ def compute_max_seed(ref: str, read: str, seed_idxes: list[list[int]],
     the calculated position. Version 2 of this function now also returns the alignments 
     themselves of the read and respective 50 base segment of the ref genome.
     """
+    if len(seed_idxes) == 0:
+        return None
     best_score = float('-inf')
     best_idx = -1
-    s_best_align = ''
-    t_best_align = ''
+    best_seed = -1
     for i in range(0, len(seed_idxes)):
         for ref_idx in seed_idxes[i]:
             ref_segment = ref[ref_idx - i:ref_idx - i + read_length]
-            score, s_align, t_align, = BandedAlignment(match_reward, mismatch_penalty, indel_penalty, band_width,
+            score = banded_alignment(match_reward, mismatch_penalty, indel_penalty, band_width,
                                             ref_segment, read)
             if score > best_score:
                 best_score = score
                 best_idx = ref_idx
-                s_best_align = s_align
-                t_best_align = t_align
-    return best_idx, best_score, s_best_align, t_best_align
+                best_seed = i
+    best_ref_seg = ref[best_idx - best_seed:best_idx - best_seed + read_length]
+    _, s_align, t_align = BandedAlignmentWithBackTrack(match_reward, mismatch_penalty, indel_penalty, band_width,
+                                                              best_ref_seg, read)
+    return best_idx, best_score, s_align, t_align
 
 ### SEED GENERATION
 
