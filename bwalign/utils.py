@@ -313,11 +313,18 @@ def partial_suffix_array(sa: list[int], k: int) -> dict[int, int]:
     return partial
 
 ## BWT creation
+
 def bwt_from_suffix_array(text: str, suffix_array: List[int]) -> str:
     bwt = []
     for idx in suffix_array:
         bwt.append(text[idx-1])
     return ''.join(bwt)
+
+def bwt_psa_out(text: str, k: int) -> tuple[str, dict[int, int]]:
+    sa = suffix_array(text)
+    bwt = bwt_from_suffix_array(text, sa)
+    psa = partial_suffix_array(sa, k)
+    return (bwt, psa)
 
 def compute_rank_arr(bwt: str) -> list[int]:
     """

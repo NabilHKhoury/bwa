@@ -19,9 +19,7 @@ def main():
     #BWT and SA
     K = 5
     ref_text = str(reference) + '$'
-    sa = suffix_array(ref_text)
-    psa = partial_suffix_array(sa, K)
-    bwt = bwt_from_suffix_array(ref_text, sa)
+    bwt, psa = bwt_psa_out(ref_text, K)
     first_occurrences = compute_first_occurrences(bwt)
     checkpoint_arrs = compute_checkpoint_arrs(bwt)
     ranks = compute_rank_arr(bwt)
