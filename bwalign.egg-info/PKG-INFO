@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: bwalign
-Version: 1.3.6
+Version: 1.4.7
 Summary: A burrows-wheeler seed and extend aligner
 Home-page: https://github.com/NabilHKhoury/bwalign
 Author: ['Adrian Layer, Nabil Khoury, Yasmin Jabir']

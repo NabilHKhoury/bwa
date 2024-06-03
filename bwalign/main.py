@@ -1,7 +1,7 @@
 from .utils import *
 import pysam
 import argparse
-import tqdm
+from tqdm import tqdm
 
 def main():
     parser = argparse.ArgumentParser(description="Run BWA alignment with specified reference genome and FASTQ file.")
@@ -36,7 +36,7 @@ def main():
         for read_id, read_seq, qual_scores in tqdm(reads):
             
             seed_idxes = generate_seeds(str(read_seq), bwt, 19, psa, first_occurrences, checkpoint_arrs, ranks)
-            best_idx, score, alignment_s, alignment_t = compute_max_seed(str(reference), str(read_seq), seed_idxes, 2, 1, 2, 1, read_length)
+            best_idx, score, alignment_s, alignment_t = compute_max_seed(str(reference), str(read_seq), seed_idxes, 2, 2, 2, 10, read_length)
 
             #create a SAM entry for the aligned read
             a = pysam.AlignedSegment()
