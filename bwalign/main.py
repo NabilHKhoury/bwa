@@ -1,7 +1,7 @@
 from .utils import *
 import pysam
 import argparse
-from time import tqdm
+import tqdm
 
 def main():
     parser = argparse.ArgumentParser(description="Run BWA alignment with specified reference genome and FASTQ file.")
