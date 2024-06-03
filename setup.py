@@ -2,14 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='bwalign',
-    version='1.2.5',    
+    version='1.3.5',    
     description='A burrows-wheeler seed and extend aligner',
     url='https://github.com/NabilHKhoury/bwalign',
     author=['Adrian Layer, Nabil Khoury, Yasmin Jabir'],
     license='MIT',
     packages=find_packages(),
     install_requires=['biopython',
-                      'pysam',                
+                      'pysam',
+                      'tqdm',                
                       ],
     entry_points={
         'console_scripts': [
