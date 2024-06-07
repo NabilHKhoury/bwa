@@ -1,6 +1,6 @@
 # BWALIGN
 
-This is a python tool designed for read alignment to a reference genome. It utilizes the seed and extend method to identify exact matches with a burrows-wheeler matching algorithm, then extends these exact matches across entire reads using a smith-waterman affine alignment algorithm.
+This is a python tool designed for read alignment to a reference genome. It utilizes the seed and extend method to identify exact matches with a burrows-wheeler matching algorithm, then extends these exact matches across entire reads using a Needleman-Wunsch banded global alignment algorithm.
 
 ## Installation Instructions
 
@@ -24,11 +24,9 @@ Usage is as follows:
 
 Both the reference genome and single fastq file are required parameters.
 
-This will align reads to your reference genome using the default scoring parameters for affine alignment, which are: match reward (2), mismatch penalty (-1), gap opening penalty (-2), gap extension penalty (-1).
+This will align reads to your reference genome using our default scoring parameters for banded alignment, which are: match reward (2), mismatch penalty (-2), gap opening penalty (-2), band parameter (10).
 
-If you wish to run 
-
-On a test dataset from this project, do:
+If you wish to run on a test dataset from this project, do:
 
 `git clone git@github.com:NabilHKhoury/bwalign.git`
 
@@ -38,7 +36,7 @@ And run `bwalign` on the reference genome `random_reference.fasta` and `random_r
 
 ## Output/File Format
 
-The output file will be a SAM file with the name `output.sam` (will be changed in future releases). It will be outputted in the directory you ran `bwalign` from.
+The output file will be a SAM file with the name `output.sam`. It will be outputted in the directory you ran `bwalign` from.
 
 ## Contributors
 
