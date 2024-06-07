@@ -3,7 +3,28 @@ import pysam
 import argparse
 from tqdm import tqdm
 
+"""
+    File:          main.py
+    Description:   Executes entire bwalign workflow
+
+    Names:         Adrian Layer, Nabil Khoury, Yasmin A. Jaber
+    Emails:        alayer@ucsd.edu, nkhoury@ucsd.edu, yjaber@ucsd.edu
+    Project:       bwalign (final project for CSE 185 @ UC San Diego)
+    Repository:    https://github.com/NabilHKhoury/bwalign
+"""
+
 def main():
+    """
+    Workflow can be broken down into three distinct parts:
+    
+    1. Parsing of fasta and fastq files, and storage in auxiliary data structures.
+    2. Using Burrows-Wheeler/suffix array algorithms to seed reads, then using
+       banded Needleman-Wunsch global alignment to extend those reads and determine
+       best matches.
+    3. Writing these best matches into SAM file format.
+    """
+    ### PART 1 OF WORKFLOW - PARSING FILES
+    
     parser = argparse.ArgumentParser(description="Run BWA alignment with specified reference genome and FASTQ file.")
     parser.add_argument("reference_genome", type=str, help="Path to the reference genome file")
     parser.add_argument("fastq_file", type=str, help="Path to the FASTQ file")
@@ -16,6 +37,8 @@ def main():
     
     # Parse the reference genome
     ref_id, reference = parse_reference_genome(args.reference_genome)
+    
+    ### PART 2 OF WORKFLOW - SEED AND EXTEND
     
     #BWT and SA
     K = 5
@@ -30,6 +53,8 @@ def main():
         'HD': {'VN': '1.0', 'SO': 'unsorted'},
         'SQ': [{'SN': ref_id, 'LN': len(reference)}]
     }
+    
+    ### PART 3 OF WORKFLOW - WRITE TO SAM FILE
     
     #write to sam FILE
     with pysam.AlignmentFile("output.sam", "w", header=header) as samfile:
@@ -47,9 +72,8 @@ def main():
             if score != float('-inf'):
                 a.reference_start = best_idx
                 a.mapping_quality = 60
-                # a.mapping_quality = calculate_mapping_quality(score, read_length)
                 a.cigarstring = calculate_cigar(alignment_s, alignment_t)
-            else:
+            else: # in the case read could not be aligned
                 a.reference_start = 0
                 a.mapping_quality = 0
                 a.cigarstring = '0M'

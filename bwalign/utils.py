@@ -3,31 +3,30 @@ import random
 import numpy as np
 import sys
 
-### MAPPING QUALITY
+"""
+    File:          utils.py
+    Description:   Script containing all definitions working towards execution of bwalign workflow
 
-def calculate_mapping_quality(score, read_length):  
-    max_possible_score = 2 * read_length
-    
-    if score < 0:
-        return 0 
-
-    if max_possible_score > 0:
-        probability = score / max_possible_score
-    else:
-        probability = 0
-
-    if probability == 1:
-        return max_possible_score
-    elif probability > 0:
-        mapping_quality = -10 * np.log10(1.0 - probability)
-    else:
-        mapping_quality = 0
-
-    return min(int(mapping_quality), 60)
+    Names:         Adrian Layer, Nabil Khoury, Yasmin A. Jaber
+    Emails:        alayer@ucsd.edu, nkhoury@ucsd.edu, yjaber@ucsd.edu
+    Project:       bwalign (final project for CSE 185 @ UC San Diego)
+    Repository:    https://github.com/NabilHKhoury/bwalign
+"""
 
 ### CIGAR STRING CREATOR
 
 def calculate_cigar(alignment_s, alignment_t):
+    """
+    Calculates the cigar string of alignments between strings s and t, inputted
+    in the form of alignments of both strings.
+    
+    args:
+        alignment_s (str): the alignment of string s
+        alignment_t (str): the alignment of string t
+    
+    returns:
+        cigar string of alignment between s and t
+    """
     cigar = []
     match = 0
     ins = 0
@@ -64,7 +63,25 @@ def calculate_cigar(alignment_s, alignment_t):
 
 ### BANDED ALIGNMENT
 
-def banded_alignment(mr: int, mmp: int, indp: int, bp: int, s: str, t: str) -> int:
+def banded_alignment(mr: int, mmp: int, indp: int, bp: int, s: str, t: str) -> float:
+    """
+    Calculates the maximal banded alignment SCORE between strings s and t given
+    alignment parameters.
+    
+    O(n * m) runtime where n = len(s), m = len(t)
+    
+    args:
+        mr (int): reward for a match between two bases in the alignment
+        mmp (int): penalty for a mismtach bewteen two bases in the alignment
+        indp (int): penalty for an insertion or deletion in the alignment
+        bp (int): band width parameter for alignment
+        s (str): first string to be aligned
+        t (str): second string to be aligned
+        
+    returns:
+        best alignment score of all alignments between s and t, returns float('-inf')
+        if no alignment is possible given the parameters
+    """
     l = np.full((len(s)+1,len(t)+1), -np.inf)
     for i in range(0, len(s) + 1):
         for j in range(0, len(t) + 1):
@@ -92,6 +109,25 @@ def banded_alignment(mr: int, mmp: int, indp: int, bp: int, s: str, t: str) -> i
 
 def BandedAlignmentWithBackTrack(match_reward: int, mismatch_penalty: int, indel_penalty: int,
                     band_parameter: int, s: str, t: str) -> tuple[int, str, str]:
+    """
+    Calculates the maximal banded alignment SCORE along with the ALIGNMENTS THEMSELVES
+    between strings s and t given alignment parameters.
+    
+    O(n * m) runtime where n = len(s), m = len(t)
+    
+    args:
+        mr (int): reward for a match between two bases in the alignment
+        mmp (int): penalty for a mismtach bewteen two bases in the alignment
+        indp (int): penalty for an insertion or deletion in the alignment
+        bp (int): band width parameter for alignment
+        s (str): first string to be aligned
+        t (str): second string to be aligned
+        
+    returns:
+        - best alignment score of all alignments between s and t, returns float('-inf')
+        if no alignment is possible given the parameters
+        - returns the alignment strings of s and t.
+    """
     sys.setrecursionlimit(1500)
     l = [[float('-inf')] * (len(t) + 1) for _ in range(len(s) + 1)] # score matrix
     b = [[None] * (len(t)) for _ in range(len(s))] # backtrack matrix
@@ -122,7 +158,18 @@ def BandedAlignmentWithBackTrack(match_reward: int, mismatch_penalty: int, indel
     return l[len(s)][len(t)], s_align, t_align
 
 def backtrack(b: list[list[str]], s: str, t: str, i: int, j: int, band_parameter: int) -> tuple[str, str]:
-    """Traces alignment using backtracking matrix b."""
+    """
+    Traces alignment using backtracking matrix b from banded alignment in order to
+    build the alignments of s and t backwards.
+    
+    args:
+        b (list[list[str]]): backtracking matrix of pointers with (up, down, diag) ptrs
+        s (str): first aligned string
+        t (str): second aligned string
+        i (int): current index in s
+        j (int): current index in t
+        band_parameter (int): band width parameter for alignment
+    """
     if i < 0 and j < 0: # if both i and j reach -1 at the same time, we can just return empty string.
         return '',''
     elif i < 0: # if i reaches -1 first, need to append the rest of t up to index j to t prime, and a number of '-' equal to the length of that string to s prime.
@@ -146,11 +193,20 @@ def compute_max_seed(ref: str, read: str, seed_idxes: list[list[int]],
                      indel_penalty: int, band_width: int,
                      read_length: int) -> tuple[int, int, str, str]:
     """
-    For each index in the seeds list, generates an affine alignment (50x50) for each seed index.
-    By the end, returns position in ref and score of max scoring alignment. The alignment
-    will be between the entire read and a length 50 segment of the reference starting at
-    the calculated position. Version 2 of this function now also returns the alignments 
-    themselves of the read and respective 50 base segment of the ref genome.
+    Generates the best scoring seed (based on banded alignment score) of all seeds
+    in a seed list of indexes. Returns that seed index, along with the score, and
+    the alignments themselves.
+    
+    args:
+        ref (str): reference genome
+        read (str): read being aligned to reference
+        seed_idxes (list[list[int]]): list of all positions in the genome where each
+                                      position in the read found an exact kmer match
+        match_reward (int): reward for a match of bases in the banded alignment
+        mismatch_penalty (int): penalty for mismatch of bases in alignment
+        indel_penalty (int): penalty for insertion or deletion in alignment
+        band_width (int): band parameter for alignment
+        read_length (int): length of the read being aligned
     """
     if len(seed_idxes) == 0:
         return None
@@ -187,6 +243,12 @@ def get_rank(char: str) -> int:
     """
     Converts the given char to its ascii value, then subtracts 'a' from it to get a
     clean rank value.
+    
+    args:
+        char (str): character to be converted
+    
+    returns:
+        rank of the given char
     """
     return ord(char) - ord('a')
 
@@ -194,10 +256,16 @@ def suffix_array(text: str) -> list[int]:
     """
     Generates the suffix array of a given database string text using O(n(logn)^2)
     time complexity and O(n) space. To improve to O(nlogn), can use radix sort to
-    sort the suffix lists.
+    sort the suffix lists. (n = len(text))
     
     Algorithm ripped from:
     https://www.geeksforgeeks.org/suffix-array-set-2-a-nlognlogn-algorithm/
+    
+    args:
+        text (str): text to be processed
+    
+    returns:
+        suffix array of text
     """
     
     # get the intial array of suffixes before starting to loop through and rank them.
@@ -266,6 +334,17 @@ def suffix_array(text: str) -> list[int]:
 def partial_suffix_array(sa: list[int], k: int) -> dict[int, int]:
     """
     Generate a partial suffix array for the given text and interval K.
+    
+    Runs in O(n) w.r.t. suffix array size.
+    
+    args:
+        sa (list[int]): suffix array to be converted
+        k (int): partial suffix array parameter for conversion - larger k gives
+                 a smaller partial suffix array, but increases runtime in future
+                 calculations using the partial suffix array
+        
+    returns:
+        partial suffix array of size depending on k value
     """
     partial = dict()
     for idx in sa:
@@ -276,6 +355,18 @@ def partial_suffix_array(sa: list[int], k: int) -> dict[int, int]:
 ## BWT creation
 
 def bwt_from_suffix_array(text: str, suffix_array: list[int]) -> str:
+    """
+    Creates a burrows-wheeler transform of a given text using its suffix array.
+    
+    Runs in O(n).
+    
+    args:
+        text (str): text to be transformed
+        suffix_array (list[int]): suffix array of text
+    
+    returns:
+        burrows-wheeler transform of text
+    """
     bwt = []
     for idx in suffix_array:
         bwt.append(text[idx-1])
@@ -293,6 +384,14 @@ def compute_rank_arr(bwt: str) -> list[int]:
     The rank is the number of occurrences of whatever character is at that position, up to
     that position. This can be done in linear time by iterating through the bwt. The ranks
     will be returned in the form of a list of ranks, obviously indices will be in-built.
+    
+    Runs in O(n), where n is len(bwt)
+    
+    args:
+        bwt (str): burrows-wheeler transform of our string
+    
+    returns:
+        rank array of the burrows wheeler transform
     """
     rank = []
     counts = dict()
@@ -309,6 +408,14 @@ def compute_first_occurrences(bwt: str) -> dict[str, int]: # the mapping of c in
     order, we can count the ascii code of each character in the last column, then iterate
     from 0 to 255 to get the count of each ascii character in ascending lexicographic order.
     This is done in linear time.
+    
+    Runs in O(n), where n is len(bwt)
+    
+    args:
+        bwt (str): burrows-wheeler transform of our string
+    
+    returns:
+        first occurrences dict of the burrows wheeler transform
     """
     C = dict()
     counts = [0 for _ in range(256)]
@@ -327,6 +434,14 @@ def compute_checkpoint_arrs(bwt: str) -> dict[int, list[int]]:
     """
     Similar to ranks, but instead the list stored contains the rank of every character up to
     that index, if the index % C is 0. More memory efficient.
+    
+    Runs in O(n), where n is len(bwt)
+    
+    args:
+        bwt (str): burrows-wheeler transform of our string
+    
+    returns:
+        checkpoint arrays dict of the burrows-wheeler transform
     """
     C = 5
     ranks = dict()
@@ -338,6 +453,26 @@ def compute_checkpoint_arrs(bwt: str) -> dict[int, list[int]]:
     return ranks
 
 def compute_rank(bwt: str, idx: int, ranks: dict[int, list[int]], symbol: str, C: int) -> int: # idx can be either top or bot
+    """
+    Computes the rank of a given symbol within the burrows-wheeler transform using
+    auxiliary data structures. In this case, we are not to confuse rank with the
+    previously defined rank array. In this case, rank for a symbol L(j) at position
+    j in string L as the number of occurrences of the character L(j) that occur in
+    positions up to and including j. This technique uses the pre-computed checkpoint
+    arrays, now referred to as RANKS.
+    
+    Runs in O(1).
+    
+    args:
+        bwt (str): burrows-wheeler transform of string
+        idx (int): index of character symbol
+        ranks (dict[int, list[int]]): pre-computed rank (checkpoint) arrays
+        symbol (str): character we are attempting to rank
+        C (int): constant defined for both partial suffix array and checkpoint arrays
+    
+    returns:
+        rank of character symbol
+    """
     idx_dist_from_chkpnt = idx % C
     idx_rank = ranks[idx - idx_dist_from_chkpnt][ord(symbol)]
     for j in range(idx - idx_dist_from_chkpnt + 1, idx + 1):
@@ -346,6 +481,21 @@ def compute_rank(bwt: str, idx: int, ranks: dict[int, list[int]], symbol: str, C
     return idx_rank
 
 def bw_better_match_pattern(bwt: str, pattern: str, first_occurrences: dict[str,int], ranks: list[list[int]]) -> tuple[int,int]:
+    """
+    Matches a pattern and finds a range of its possible indices in last col of bwt using 
+    auxiliary data structures that we have precomputed
+    
+    Runs in O(|pattern|)
+    
+    args:
+        bwt (str): burrows-wheeler transform of text
+        pattern (str): pattern we are matching to text
+        first_occurrences (dict[str,int]): first-occurences pre-computed data structure
+        ranks: pre-computed ranks data structure
+    
+    returns:
+        a range of indices in last col of bwt where the pattern could match in text
+    """
     C = 5
     top = 0
     bot = len(bwt) - 1
@@ -367,6 +517,23 @@ def bw_better_match_pattern(bwt: str, pattern: str, first_occurrences: dict[str,
     return (top, bot + 1)
 
 def compute_idxes_from_top_bot(start: int, end: int, partial_s_array: dict[int, int], bwt: str, rank: list[int], occurrences: list[int]) -> list[int]:
+    """
+    Uses the start and end indices we have computed to calculate a list of exact
+    indices where the pattern matches in text
+    
+    Runs in O(|pattern|)
+    
+    args:
+        start (int): starting index in last col of bwt where matches can occur
+        end (int): ending index in last col of bwt where matches can occur
+        partial_s_array (dict[int, int]): partial suffix array of text
+        bwt (str): burrows-wheeler transform of text
+        rank (list[int]): rank array given by compute_rank_array function
+        occurrences (list[int]): pre-computed first occurrences array
+    
+    returns:
+        list of all indices where the pattern matches in text
+    """
     pattern_idxes = []
     for i in range(start, end):
         p = i
@@ -389,6 +556,20 @@ def generate_seeds(read: str, bwt: str, k: int, psa: dict[int, int],
     with each index being an index i in the read from 0 to len(read) - k + 1. The corresponding list at each
     index is a list of exact match indices of the kmer at read[i:i+k] located in the reference
     genome. Note that even if two kmers are identical, their indices in the read are not.
+    
+    Runs in O(m), where m = len(read)
+    
+    args:
+        read (str): read being processed for seeds
+        bwt (str): burrows-wheeler transform of reference genome
+        k (int): seed length parameter
+        psa (dict[int,int]): partial suffix array of reference genome
+        first_occurrences (dict[str, int]): first occurrences array of bwt
+        checkpoints_arrs (dict[int, list[int]]): checkpoint arrays of bwt
+        ranks (list[int]): rank arrays of bwt
+        
+    returns:
+        a list of lists containing exact match indices for the read in reference
     """
     seed_idxes = []
     for i in range(0, len(read) - k + 1):
@@ -466,13 +647,18 @@ def generate_fasta_file(fasta_path: str, sequence_id: str, sequence: str):
         handle.write(sequence)
 
 def generate_fastq_file(file, read_id, sequence, quality):
-    """Append a read to the FASTQ file."""
+    """
+    Append a read to the FASTQ file.
+    """
     file.write(f"@{read_id}\n")
     file.write(sequence + "\n")
     file.write("+\n")
     file.write(quality + "\n")
 
 def main():
+    """
+    Used to generate random data for testing
+    """
     # Define parameters for random sequence and quality scores
     sequence_length = 100000
     sequence_id_length = 10
